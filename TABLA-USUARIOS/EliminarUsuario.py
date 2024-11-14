@@ -23,11 +23,15 @@ def lambda_handler(event, context):
 
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('TABLA-USUARIOS')
-    response = table.delete_item(
-        Key={
-            'usuario_id': usuario_id
+    
+    existing_user = table.get_item(Key={'usuario_id': usuario_id})
+    if 'Item' not in existing_user:
+        return {
+            'statusCode': 404,
+            'body': f'Usuario {usuario_id} no existe o ya fue eliminado.'
         }
-    )
+
+    table.delete_item(Key={'usuario_id': usuario_id})
 
     return {
         'statusCode': 200,

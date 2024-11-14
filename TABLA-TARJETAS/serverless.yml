@@ -86,3 +86,10 @@ resources:
           - AttributeName: tarjeta_id
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: tarjeta_id-index
+            KeySchema:
+              - AttributeName: tarjeta_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

@@ -2,6 +2,11 @@ import boto3
 import json
 from datetime import datetime
 from decimal import Decimal
+import random
+
+def generate_card_number():
+    """Genera un número de tarjeta de 16 dígitos en formato xxxx-xxxx-xxxx-xxxx"""
+    return '-'.join([''.join([str(random.randint(0, 9)) for _ in range(4)]) for _ in range(4)])
 
 def lambda_handler(event, context):
     if isinstance(event['body'], str):
@@ -39,10 +44,15 @@ def lambda_handler(event, context):
             'body': 'Error: Estado inválido. Solo se permite activa o bloqueada.'
         }
 
-    tarjetas_count = tarjetas_table.query(
-        KeyConditionExpression=boto3.dynamodb.conditions.Key('cuenta_id').eq(cuenta_id)
-    )['Count']
-    tarjeta_id = f"TARJETA-{tarjetas_count + 1}"
+    tarjeta_id = generate_card_number()
+    while True:
+        existing_card = tarjetas_table.query(
+            IndexName='tarjeta_id-index',
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tarjeta_id').eq(tarjeta_id)
+        )
+        if existing_card['Count'] == 0:
+            break
+        tarjeta_id = generate_card_number()
 
     tarjeta_item = {
         'cuenta_id': cuenta_id,

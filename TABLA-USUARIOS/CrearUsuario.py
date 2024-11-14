@@ -3,6 +3,7 @@ import hashlib
 import uuid
 import json
 from datetime import datetime, timedelta
+from boto3.dynamodb.conditions import Key
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -47,11 +48,12 @@ def lambda_handler(event, context):
             }
         }
 
-    response = usuarios_table.scan(
-        FilterExpression="email = :email_val",
-        ExpressionAttributeValues={":email_val": body['email']}
+    email_response = usuarios_table.query(
+        IndexName='email-index',  # Nombre del índice secundario global para email
+        KeyConditionExpression=Key('email').eq(body['email'])
     )
-    if response.get('Items'):
+    
+    if email_response.get('Items'):
         return {
             'statusCode': 400,
             'body': {
@@ -59,9 +61,21 @@ def lambda_handler(event, context):
             }
         }
 
+    dni_response = usuarios_table.query(
+        IndexName='dni-index',  # Nombre del índice secundario global para dni
+        KeyConditionExpression=Key('dni').eq(body['dni'])
+    )
+    
+    if dni_response.get('Items'):
+        return {
+            'statusCode': 400,
+            'body': {
+                'message': 'El DNI ya está registrado. Por favor, utiliza otro DNI.'
+            }
+        }
+
     usuario_id = get_next_user_id(usuarios_table)
-    password = body['password']
-    hashed_password = hash_password(password)
+    hashed_password = hash_password(body['password'])
 
     usuarios_table.put_item(
         Item={

@@ -75,7 +75,24 @@ resources:
         AttributeDefinitions:
           - AttributeName: usuario_id
             AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: dni
+            AttributeType: S
         KeySchema:
           - AttributeName: usuario_id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: email-index
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: dni-index
+            KeySchema:
+              - AttributeName: dni
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

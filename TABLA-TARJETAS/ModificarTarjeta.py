@@ -12,6 +12,13 @@ def lambda_handler(event, context):
     tarjeta_id = body.get('tarjeta_id')
     tarjeta_datos = body.get('tarjeta_datos', {})
 
+    estado = tarjeta_datos.get('estado')
+    if estado not in ['activa', 'bloqueada']:
+        return {
+            'statusCode': 400,
+            'body': 'Error: Estado inválido. Solo se permite activa o bloqueada.'
+        }
+
     dynamodb = boto3.resource('dynamodb')
     cuentas_table = dynamodb.Table('TABLA-CUENTA')
     tarjetas_table = dynamodb.Table('TABLA-TARJETAS')
