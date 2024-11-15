@@ -34,9 +34,15 @@ def lambda_handler(event, context):
         
         # Verificar si la solicitud ya ha sido respondida
         if estado_actual == 'respondido':
+            # Retornar el mensaje de error junto con los detalles de la solicitud original
             return {
                 'statusCode': 400,
-                'body': json.dumps("La solicitud ya fue respondida y no puede ser modificada.")
+                'body': json.dumps({
+                    'mensaje': 'La solicitud ya fue respondida y no puede ser modificada.',
+                    'titulo': solicitud_anterior.get('Titulo', 'No disponible'),
+                    'descripcion': solicitud_anterior.get('descripcion', 'No disponible'),
+                    'respuesta': solicitud_anterior.get('respuesta', 'No disponible')
+                })
             }
         
         # Actualizar la solicitud si está en estado "pendiente"
