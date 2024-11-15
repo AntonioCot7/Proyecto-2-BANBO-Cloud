@@ -78,6 +78,10 @@ resources:
             AttributeType: S
           - AttributeName: pago_id
             AttributeType: S
+          - AttributeName: tipo
+            AttributeType: S
+          - AttributeName: fecha
+            AttributeType: S
         KeySchema:
           - AttributeName: usuario_id
             KeyType: HASH
@@ -86,3 +90,22 @@ resources:
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
+        GlobalSecondaryIndexes:
+          - IndexName: TipoIndex
+            KeySchema:
+              - AttributeName: usuario_id
+                KeyType: HASH
+              - AttributeName: tipo
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        LocalSecondaryIndexes:
+          - IndexName: FechaIndex
+            KeySchema:
+              - AttributeName: usuario_id  # Mismo HASH que la tabla
+                KeyType: HASH
+              - AttributeName: fecha
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
