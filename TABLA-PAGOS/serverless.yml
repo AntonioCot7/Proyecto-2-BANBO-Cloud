@@ -67,7 +67,6 @@ functions:
           path: /pago/eliminar
           method: delete
           cors: true
-
 resources:
   Resources:
     PagosTable:
@@ -79,24 +78,11 @@ resources:
             AttributeType: S
           - AttributeName: pago_id
             AttributeType: S
-          - AttributeName: tipo
-            AttributeType: S
-          - AttributeName: fecha
-            AttributeType: S
         KeySchema:
           - AttributeName: usuario_id
             KeyType: HASH
           - AttributeName: pago_id
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        GlobalSecondaryIndexes:
-          - IndexName: TipoIndex
-            KeySchema:
-              - AttributeName: tipo
-                KeyType: HASH
-              - AttributeName: fecha
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
