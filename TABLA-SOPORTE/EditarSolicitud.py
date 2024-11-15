@@ -29,8 +29,8 @@ def lambda_handler(event, context):
             }
 
         # Obtener el estado actual de la solicitud
-        solicitud = response['Item']
-        estado_actual = solicitud.get('estado', 'pendiente')
+        solicitud_anterior = response['Item']  # Guardar los datos originales antes de modificar
+        estado_actual = solicitud_anterior.get('estado', 'pendiente')
         
         # Verificar si la solicitud ya ha sido respondida
         if estado_actual == 'respondido':
@@ -52,17 +52,34 @@ def lambda_handler(event, context):
             }
         )
         
-        # Retornar la solicitud actualizada
+        # Crear el JSON de la solicitud actualizada
+        solicitud_modificada = {
+            'momento': 'actual modificado',
+            'usuario_id': usuario_id,
+            'ticket_id': ticket_id,
+            'Titulo': titulo,
+            'descripcion': descripcion,
+            'estado': 'pendiente',
+            'fecha': fecha_actualizacion
+        }
+
+        # Crear el JSON de la solicitud anterior
+        solicitud_anterior_json = {
+            'momento': 'anterior',
+            'usuario_id': solicitud_anterior['usuario_id'],
+            'ticket_id': solicitud_anterior['ticket_id'],
+            'Titulo': solicitud_anterior['Titulo'],
+            'descripcion': solicitud_anterior['descripcion'],
+            'estado': solicitud_anterior['estado'],
+            'fecha': solicitud_anterior['fecha']
+        }
+
+        # Retornar ambos JSON en la respuesta
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'momento': 'actual modificado',
-                'usuario_id': usuario_id,
-                'ticket_id': ticket_id,
-                'Titulo': titulo,
-                'descripcion': descripcion,
-                'estado': 'pendiente',
-                'fecha': fecha_actualizacion
+                'solicitud_anterior': solicitud_anterior_json,
+                'solicitud_modificada': solicitud_modificada
             })
         }
     
