@@ -1,10 +1,11 @@
 import boto3
+import json
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TABLA-SOPORTE')
 
 def lambda_handler(event, context):
-    data = event['body']
+    data = json.loads(event['body'])
     usuario_id = data['usuario_id']
     
     response = table.query(
