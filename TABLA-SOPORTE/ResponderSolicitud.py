@@ -27,9 +27,12 @@ def lambda_handler(event, context):
         fecha_respuesta = datetime.utcnow().isoformat()
         table.update_item(
             Key={'usuario_id': usuario_id, 'ticket_id': ticket_id},
-            UpdateExpression="SET response = :response, estado = :estado, fecha_respuesta = :fecha",
+            UpdateExpression="SET #resp = :response_text, estado = :estado, fecha_respuesta = :fecha",
+            ExpressionAttributeNames={
+                '#resp': 'response'  # Alias para el atributo 'response'
+            },
             ExpressionAttributeValues={
-                ':response': response_text,
+                ':response_text': response_text,
                 ':estado': 'respondido',
                 ':fecha': fecha_respuesta
             }
