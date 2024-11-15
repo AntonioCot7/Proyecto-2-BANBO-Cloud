@@ -4,36 +4,34 @@ from datetime import datetime
 import json
 import os
 
-# DynamoDB setup
+# Obtener referencia a la tabla DynamoDB usando la variable de entorno
 dynamodb = boto3.resource('dynamodb')
-pagos_table = dynamodb.Table(os.environ['PAGOS_TABLE'])
+pagos_table = dynamodb.Table('TABLA-PAGOS')
 
 def lambda_handler(event, context):
     try:
-        # Cargar el cuerpo de la solicitud
+        # Cargar el cuerpo de la solicitud, conviértelo a JSON si es necesario
         data = json.loads(event['body'])
-
-        # Validar campos requeridos
-        required_fields = ['usuario_id', 'datos_pago']
-        for field in required_fields:
-            if field not in data:
-                return {
-                    'statusCode': 400,
-                    'body': json.dumps({
-                        'error': f"El campo {field} es obligatorio"
-                    })
-                }
         
-        datos_pago = data['datos_pago']
-        if not all(k in datos_pago for k in ['monto', 'titulo', 'descripcion']):
+        # Validación de campos requeridos
+        if 'usuario_id' not in data or 'datos_pago' not in data:
             return {
                 'statusCode': 400,
                 'body': json.dumps({
-                    'error': "Los campos 'monto', 'titulo' y 'descripcion' son obligatorios en 'datos_pago'"
+                    'error': "Campos 'usuario_id' y 'datos_pago' son obligatorios"
                 })
             }
         
-        # Generar ID y preparar el ítem
+        datos_pago = data['datos_pago']
+        if 'monto' not in datos_pago or 'titulo' not in datos_pago or 'descripcion' not in datos_pago:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({
+                    'error': "Campos 'monto', 'titulo', y 'descripcion' son obligatorios en 'datos_pago'"
+                })
+            }
+        
+        # Definir datos de la transacción
         usuario_id = data['usuario_id']
         pago_id = str(uuid.uuid4())
         monto = datos_pago['monto']
@@ -52,8 +50,9 @@ def lambda_handler(event, context):
         }
 
         # Insertar en DynamoDB
-        pagos_table.put_item(Item=item)
-
+        response = pagos_table.put_item(Item=item)
+        print("Insert response:", response)  # Agregar para verificar respuesta de DynamoDB
+        
         # Respuesta de éxito
         return {
             'statusCode': 200,
@@ -64,8 +63,7 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
-        # Manejo de errores inesperados
-        print(f"Error: {str(e)}")
+        print(f"Error en Lambda: {str(e)}")  # Imprimir error en los logs de CloudWatch
         return {
             'statusCode': 500,
             'body': json.dumps({
