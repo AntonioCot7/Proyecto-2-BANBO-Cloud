@@ -10,8 +10,7 @@ provider:
     role: arn:aws:iam::316129865556:role/LabRole
   environment:
     PAGOS_TABLE: TABLA-PAGOS
-    TARJETAS_TABLE: TABLA-TARJETAS
-
+    
 functions:
   CrearPagoDeuda:
     handler: CrearPagoDeuda.lambda_handler
