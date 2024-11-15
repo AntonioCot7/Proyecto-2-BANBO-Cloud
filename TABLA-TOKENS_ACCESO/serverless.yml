@@ -30,7 +30,16 @@ resources:
         AttributeDefinitions:
           - AttributeName: token
             AttributeType: S
+          - AttributeName: usuario_id
+            AttributeType: S
         KeySchema:
           - AttributeName: token
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: usuario_id-index
+            KeySchema:
+              - AttributeName: usuario_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

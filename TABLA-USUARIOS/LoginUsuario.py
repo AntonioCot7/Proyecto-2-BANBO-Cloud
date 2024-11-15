@@ -80,6 +80,7 @@ def lambda_handler(event, context):
         'body': {
             'message': 'Inicio de sesión exitoso',
             'token': token,
-            'expires': expires
+            'expires': expires,
+            'usuario_id': user['usuario_id']
         }
     }

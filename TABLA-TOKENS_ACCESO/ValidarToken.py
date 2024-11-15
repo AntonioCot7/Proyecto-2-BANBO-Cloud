@@ -29,4 +29,9 @@ def lambda_handler(event, context):
     if datetime.now().strftime('%Y-%m-%d %H:%M:%S') > expires:
         return {'statusCode': 403, 'body': 'Token expirado'}
 
-    return {'statusCode': 200, 'body': 'Token válido'}
+    return {
+        'statusCode': 200,
+        'body': {
+            'usuario_id': response['Item']['usuario_id']
+        }
+    }
