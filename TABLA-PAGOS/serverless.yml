@@ -80,6 +80,10 @@ resources:
             AttributeType: S
           - AttributeName: pago_id
             AttributeType: S
+          - AttributeName: tipo
+            AttributeType: S
+          - AttributeName: fecha
+            AttributeType: S
         KeySchema:
           - AttributeName: usuario_id
             KeyType: HASH
@@ -89,9 +93,9 @@ resources:
         GlobalSecondaryIndexes:
           - IndexName: TipoIndex
             KeySchema:
-              - AttributeName: usuario_id
-                KeyType: HASH
               - AttributeName: tipo
+                KeyType: HASH
+              - AttributeName: fecha
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
